@@ -42,3 +42,28 @@ describe("POST /jumplings", () => {
     expect(response.body).toEqual(expectedJumpling);
   });
 });
+
+describe("PUT /jumplings/:id", () => {
+  it("should modify jumpling and return modified jumpling object", async () => {
+    const jumplingId = 1;
+    const modifiedJumpling = { name: "New jumpling edited" };
+
+    const response = await request(app)
+      .put(`/jumplings/${jumplingId}`)
+      .send(modifiedJumpling);
+
+    expect(response.status).toEqual(200);
+    expect(response.body).toMatchObject(modifiedJumpling);
+  });
+
+  it("should throw error if id is invalid", async () => {
+    const nonexistentJumplingId = 999;
+    const modifiedJumpling = { name: "New jumpling edited" };
+
+    const response = await request(app)
+      .put(`/jumplings/${nonexistentJumplingId}`)
+      .send(modifiedJumpling);
+
+    expect(response.status).toEqual(500);
+  });
+});

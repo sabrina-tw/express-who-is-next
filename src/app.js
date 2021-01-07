@@ -34,4 +34,15 @@ app.post("/jumplings", (req, res) => {
   res.status(201).json(newJumpling);
 });
 
+app.put("/jumplings/:id", (req, res) => {
+  const jumplingId = req.params.id;
+  const jumpling = jumplings.find(
+    (jumpling) => jumpling.id === parseInt(jumplingId)
+  );
+
+  jumpling.name = req.body.name;
+
+  res.status(200).json(jumpling);
+});
+
 module.exports = app;
