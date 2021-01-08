@@ -2,14 +2,17 @@ const express = require("express");
 const router = express.Router();
 const requireJsonContent = require("../middleware/requireJsonContent");
 
-// let jumplings = [
-//   { id: 1, name: "Sabrina" },
-//   { id: 2, name: "Mabel" },
-//   { id: 3, name: "Elson" },
-//   { id: 4, name: "Hilda" },
-// ];
-
 let jumplings = [];
+
+const presentersRouter = require("./presenters");
+router.use(
+  "/presenters",
+  (req, res, next) => {
+    req.jumplings = jumplings;
+    next();
+  },
+  presentersRouter
+);
 
 router.param("id", (req, res, next, id) => {
   let jumpling = jumplings.find((jumpling) => jumpling.id === parseInt(id));
@@ -58,25 +61,6 @@ router.delete("/:id", (req, res, next) => {
     error.statusCode = 400;
     next(error);
   }
-});
-
-let presenters = [];
-
-router.post("/presenters", (req, res, next) => {
-  if (jumplings.length < 1) {
-    const error = new Error("No jumplings yet");
-    error.statusCode = 400;
-    next(error);
-  } else {
-    const nextPresenter =
-      jumplings[Math.floor(Math.random() * jumplings.length)];
-    presenters.push(nextPresenter);
-    res.status(201).json(nextPresenter);
-  }
-});
-
-router.get("/presenters", (req, res) => {
-  res.status(200).json(presenters);
 });
 
 module.exports = router;
