@@ -56,4 +56,28 @@ app.delete("/jumplings/:id", (req, res) => {
   res.status(200).json(jumpling);
 });
 
+let presenters = [];
+
+app.post("/jumplings/presenters", (req, res, next) => {
+  if (jumplings.length < 1) {
+    const error = new Error("No jumplings yet");
+    error.statusCode = 400;
+    next(error);
+  } else {
+    const nextPresenter =
+      jumplings[Math.floor(Math.random() * jumplings.length)];
+    presenters.push(nextPresenter);
+    res.status(201).json(nextPresenter);
+  }
+});
+
+app.get("/jumplings/presenters", (req, res) => {
+  res.status(200).json(presenters);
+});
+
+app.use((err, req, res, next) => {
+  err.statusCode = err.statusCode || 500;
+  res.status(err.statusCode).send(err.message);
+});
+
 module.exports = app;
