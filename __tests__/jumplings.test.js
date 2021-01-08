@@ -30,6 +30,26 @@ describe("POST /jumplings", () => {
   });
 });
 
+describe("GET /jumplings/:id", () => {
+  it("should retrieve jumpling of specified id", async () => {
+    const jumplingId = 1;
+    const expectedJumpling = { id: 1, name: "New jumpling" };
+    const response = await request(app).get(`/jumplings/${jumplingId}`);
+
+    expect(response.status).toEqual(200);
+    expect(response.body).toEqual(expectedJumpling);
+  });
+
+  it("should throw error if jumpling does not exist", async () => {
+    const nonexistentJumplingId = 999;
+    const response = await request(app).get(
+      `/jumplings/${nonexistentJumplingId}`
+    );
+
+    expect(response.status).toEqual(404);
+  });
+});
+
 describe("PUT /jumplings/:id", () => {
   it("should modify jumpling and return modified jumpling object", async () => {
     const jumplingId = 1;
@@ -43,7 +63,7 @@ describe("PUT /jumplings/:id", () => {
     expect(response.body).toMatchObject(modifiedJumpling);
   });
 
-  it("should throw error if id is invalid", async () => {
+  it("should throw error if jumpling does not exist", async () => {
     const nonexistentJumplingId = 999;
     const modifiedJumpling = { name: "New jumpling edited" };
 
@@ -51,7 +71,7 @@ describe("PUT /jumplings/:id", () => {
       .put(`/jumplings/${nonexistentJumplingId}`)
       .send(modifiedJumpling);
 
-    expect(response.status).toEqual(400);
+    expect(response.status).toEqual(404);
   });
 
   it("should throw error if req.body is not json", async () => {
@@ -77,13 +97,13 @@ describe("DELETE /jumpling/:id", () => {
     expect(response.body).toEqual(deletedJumpling);
   });
 
-  it("should throw error if id is invalid", async () => {
+  it("should throw error if jumpling does not exist", async () => {
     const nonexistentJumplingId = 999;
 
     const response = await request(app).delete(
       `/jumplings/${nonexistentJumplingId}`
     );
 
-    expect(response.status).toEqual(400);
+    expect(response.status).toEqual(404);
   });
 });

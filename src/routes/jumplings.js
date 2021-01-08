@@ -24,6 +24,17 @@ router.get("/", (req, res) => {
   res.status(200).json(jumplings);
 });
 
+router.get("/:id", (req, res, next) => {
+  const jumpling = req.jumpling;
+  if (jumpling) {
+    res.status(200).json(jumpling);
+  } else {
+    const error = new Error("Jumpling does not exist");
+    error.statusCode = 404;
+    next(error);
+  }
+});
+
 router.post("/", requireJsonContent, (req, res) => {
   const newJumpling = {
     id: jumplings.length + 1,
@@ -43,7 +54,7 @@ router.put("/:id", requireJsonContent, (req, res, next) => {
     res.status(200).json(jumpling);
   } else {
     const error = new Error("Jumpling does not exist");
-    error.statusCode = 400;
+    error.statusCode = 404;
     next(error);
   }
 });
@@ -58,7 +69,7 @@ router.delete("/:id", (req, res, next) => {
     res.status(200).json(jumpling);
   } else {
     const error = new Error("Jumpling does not exist");
-    error.statusCode = 400;
+    error.statusCode = 404;
     next(error);
   }
 });
