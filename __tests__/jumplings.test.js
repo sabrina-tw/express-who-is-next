@@ -51,7 +51,7 @@ describe("PUT /jumplings/:id", () => {
       .put(`/jumplings/${nonexistentJumplingId}`)
       .send(modifiedJumpling);
 
-    expect(response.status).toEqual(500);
+    expect(response.status).toEqual(400);
   });
 
   it("should throw error if req.body is not json", async () => {

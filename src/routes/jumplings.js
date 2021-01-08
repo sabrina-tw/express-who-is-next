@@ -11,6 +11,12 @@ const requireJsonContent = require("../middleware/requireJsonContent");
 
 let jumplings = [];
 
+router.param("id", (req, res, next, id) => {
+  let jumpling = jumplings.find((jumpling) => jumpling.id === parseInt(id));
+  req.jumpling = jumpling;
+  next();
+});
+
 router.get("/", (req, res) => {
   res.status(200).json(jumplings);
 });
@@ -25,17 +31,18 @@ router.post("/", requireJsonContent, (req, res) => {
   res.status(201).json(newJumpling);
 });
 
-router.param("id", (req, res, next, id) => {
-  let jumpling = jumplings.find((jumpling) => jumpling.id === parseInt(id));
-  req.jumpling = jumpling;
-  next();
-});
-
 router.put("/:id", requireJsonContent, (req, res, next) => {
   const jumpling = req.jumpling;
-  req.jumpling.name = req.body.name;
 
-  res.status(200).json(jumpling);
+  if (jumpling) {
+    req.jumpling.name = req.body.name;
+
+    res.status(200).json(jumpling);
+  } else {
+    const error = new Error("Jumpling does not exist");
+    error.statusCode = 400;
+    next(error);
+  }
 });
 
 router.delete("/:id", (req, res, next) => {
