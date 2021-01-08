@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 app.use(express.json());
+const requireJsonContent = require("./middleware/requireJsonContent");
 
 app.get("/", (req, res) => {
   const output = {
@@ -24,7 +25,7 @@ app.get("/jumplings", (req, res) => {
   res.status(200).json(jumplings);
 });
 
-app.post("/jumplings", (req, res) => {
+app.post("/jumplings", requireJsonContent, (req, res) => {
   const newJumpling = {
     id: jumplings.length + 1,
     name: req.body.name,
@@ -34,7 +35,7 @@ app.post("/jumplings", (req, res) => {
   res.status(201).json(newJumpling);
 });
 
-app.put("/jumplings/:id", (req, res) => {
+app.put("/jumplings/:id", requireJsonContent, (req, res) => {
   const jumplingId = req.params.id;
   const jumpling = jumplings.find(
     (jumpling) => jumpling.id === parseInt(jumplingId)
