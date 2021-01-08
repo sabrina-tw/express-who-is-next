@@ -76,4 +76,14 @@ describe("DELETE /jumpling/:id", () => {
     expect(response.status).toEqual(200);
     expect(response.body).toEqual(deletedJumpling);
   });
+
+  it("should throw error if id is invalid", async () => {
+    const nonexistentJumplingId = 999;
+
+    const response = await request(app).delete(
+      `/jumplings/${nonexistentJumplingId}`
+    );
+
+    expect(response.status).toEqual(400);
+  });
 });

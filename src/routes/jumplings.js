@@ -38,15 +38,19 @@ router.put("/:id", requireJsonContent, (req, res, next) => {
   res.status(200).json(jumpling);
 });
 
-router.delete("/:id", (req, res) => {
-  const jumplingId = req.params.id;
-  const jumpling = jumplings.find(
-    (jumpling) => jumpling.id === parseInt(jumplingId)
-  );
-  const index = jumplings.indexOf(jumpling);
-  jumplings.splice(index, 1);
+router.delete("/:id", (req, res, next) => {
+  const jumpling = req.jumpling;
 
-  res.status(200).json(jumpling);
+  if (jumpling) {
+    const index = jumplings.indexOf(jumpling);
+    jumplings.splice(index, 1);
+
+    res.status(200).json(jumpling);
+  } else {
+    const error = new Error("Jumpling does not exist");
+    error.statusCode = 400;
+    next(error);
+  }
 });
 
 let presenters = [];
