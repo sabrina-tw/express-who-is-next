@@ -1,7 +1,6 @@
 const express = require("express");
 const app = express();
 app.use(express.json());
-const requireJsonContent = require("./middleware/requireJsonContent");
 
 app.get("/", (req, res) => {
   const output = {
@@ -19,62 +18,8 @@ app.get("/", (req, res) => {
   res.status(200).json(output);
 });
 
-let jumplings = [];
-
-app.get("/jumplings", (req, res) => {
-  res.status(200).json(jumplings);
-});
-
-app.post("/jumplings", requireJsonContent, (req, res) => {
-  const newJumpling = {
-    id: jumplings.length + 1,
-    name: req.body.name,
-  };
-
-  jumplings.push(newJumpling);
-  res.status(201).json(newJumpling);
-});
-
-app.put("/jumplings/:id", requireJsonContent, (req, res) => {
-  const jumplingId = req.params.id;
-  const jumpling = jumplings.find(
-    (jumpling) => jumpling.id === parseInt(jumplingId)
-  );
-
-  jumpling.name = req.body.name;
-
-  res.status(200).json(jumpling);
-});
-
-app.delete("/jumplings/:id", (req, res) => {
-  const jumplingId = req.params.id;
-  const jumpling = jumplings.find(
-    (jumpling) => jumpling.id === parseInt(jumplingId)
-  );
-  const index = jumplings.indexOf(jumpling);
-  jumplings.splice(index, 1);
-
-  res.status(200).json(jumpling);
-});
-
-let presenters = [];
-
-app.post("/jumplings/presenters", (req, res, next) => {
-  if (jumplings.length < 1) {
-    const error = new Error("No jumplings yet");
-    error.statusCode = 400;
-    next(error);
-  } else {
-    const nextPresenter =
-      jumplings[Math.floor(Math.random() * jumplings.length)];
-    presenters.push(nextPresenter);
-    res.status(201).json(nextPresenter);
-  }
-});
-
-app.get("/jumplings/presenters", (req, res) => {
-  res.status(200).json(presenters);
-});
+const jumplingsRouter = require("./routes/jumplings");
+app.use("/jumplings", jumplingsRouter);
 
 app.use((err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
