@@ -67,3 +67,15 @@ describe("PUT /jumplings/:id", () => {
     expect(response.status).toEqual(500);
   });
 });
+
+describe("DELETE /jumpling/:id", () => {
+  it("should delete jumpling and return deleted jumpling object", async () => {
+    const jumplingId = 1;
+    const deletedJumpling = { id: 1, name: "New jumpling edited" };
+
+    const response = await request(app).delete(`/jumplings/${jumplingId}`);
+
+    expect(response.status).toEqual(200);
+    expect(response.body).toEqual(deletedJumpling);
+  });
+});
