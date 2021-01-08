@@ -25,13 +25,15 @@ router.post("/", requireJsonContent, (req, res) => {
   res.status(201).json(newJumpling);
 });
 
-router.put("/:id", requireJsonContent, (req, res) => {
-  const jumplingId = req.params.id;
-  const jumpling = jumplings.find(
-    (jumpling) => jumpling.id === parseInt(jumplingId)
-  );
+router.param("id", (req, res, next, id) => {
+  let jumpling = jumplings.find((jumpling) => jumpling.id === parseInt(id));
+  req.jumpling = jumpling;
+  next();
+});
 
-  jumpling.name = req.body.name;
+router.put("/:id", requireJsonContent, (req, res, next) => {
+  const jumpling = req.jumpling;
+  req.jumpling.name = req.body.name;
 
   res.status(200).json(jumpling);
 });
