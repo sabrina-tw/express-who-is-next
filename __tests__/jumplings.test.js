@@ -28,6 +28,14 @@ describe("POST /jumplings", () => {
 
     expect(response.status).toEqual(400);
   });
+
+  it("should throw error if name is empty", async () => {
+    const newJumpling = { name: "" };
+
+    const response = await request(app).post("/jumplings").send(newJumpling);
+
+    expect(response.status).toEqual(400);
+  });
 });
 
 describe("GET /jumplings/:id", () => {

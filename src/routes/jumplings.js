@@ -1,8 +1,18 @@
 const express = require("express");
 const router = express.Router();
 const requireJsonContent = require("../middleware/requireJsonContent");
+const Joi = require("joi");
 
 let jumplings = [];
+
+const validateJumpling = (jumpling) => {
+  const schema = Joi.object({
+    id: Joi.number().integer().required(),
+    name: Joi.string().required(),
+  });
+
+  return schema.validate(jumpling);
+};
 
 const presentersRouter = require("./presenters");
 router.use(
@@ -35,14 +45,22 @@ router.get("/:id", (req, res, next) => {
   }
 });
 
-router.post("/", requireJsonContent, (req, res) => {
+router.post("/", requireJsonContent, (req, res, next) => {
   const newJumpling = {
     id: jumplings.length + 1,
     name: req.body.name,
   };
 
-  jumplings.push(newJumpling);
-  res.status(201).json(newJumpling);
+  const validation = validateJumpling(newJumpling);
+
+  if (validation.error) {
+    const error = new Error(validation.error.details[0].message);
+    error.statusCode = 400;
+    next(error);
+  } else {
+    jumplings.push(newJumpling);
+    res.status(201).json(newJumpling);
+  }
 });
 
 router.put("/:id", requireJsonContent, (req, res, next) => {
