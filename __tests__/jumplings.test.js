@@ -92,6 +92,17 @@ describe("PUT /jumplings/:id", () => {
 
     expect(response.status).toEqual(400);
   });
+
+  it("should throw error if name is empty", async () => {
+    const jumplingId = 1;
+    const modifiedJumpling = { name: "" };
+
+    const response = await request(app)
+      .put(`/jumplings/${jumplingId}`)
+      .send(modifiedJumpling);
+
+    expect(response.status).toEqual(400);
+  });
 });
 
 describe("DELETE /jumpling/:id", () => {

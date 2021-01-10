@@ -7,7 +7,7 @@ let jumplings = [];
 
 const validateJumpling = (jumpling) => {
   const schema = Joi.object({
-    id: Joi.number().integer().required(),
+    id: Joi.number().integer(),
     name: Joi.string().required(),
   });
 
@@ -25,8 +25,10 @@ router.use(
 );
 
 router.param("id", (req, res, next, id) => {
-  let jumpling = jumplings.find((jumpling) => jumpling.id === parseInt(id));
+  const idInteger = parseInt(id);
+  const jumpling = jumplings.find((jumpling) => jumpling.id === idInteger);
   req.jumpling = jumpling;
+
   next();
 });
 
@@ -67,9 +69,17 @@ router.put("/:id", requireJsonContent, (req, res, next) => {
   const jumpling = req.jumpling;
 
   if (jumpling) {
-    req.jumpling.name = req.body.name;
+    const jumplingRequest = { ...req.body };
+    const validation = validateJumpling(jumplingRequest);
 
-    res.status(200).json(jumpling);
+    if (validation.error) {
+      const error = new Error(validation.error.details[0].message);
+      error.statusCode = 400;
+      next(error);
+    } else {
+      req.jumpling.name = req.body.name;
+      res.status(200).json(jumpling);
+    }
   } else {
     const error = new Error("Jumpling does not exist");
     error.statusCode = 404;
