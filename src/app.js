@@ -18,12 +18,13 @@ app.get("/", (req, res) => {
   res.status(200).json(output);
 });
 
-const jumplingsRouter = require("./routes/jumplings");
+const jumplingsRouter = require("./routes/jumplings.route");
 app.use("/jumplings", jumplingsRouter);
 
 app.use((err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
-  res.status(err.statusCode).send(err.message);
+  if ((err.name = "ValidationError")) err.statusCode = 400;
+  res.status(err.statusCode).json({ message: err.message });
 });
 
 module.exports = app;

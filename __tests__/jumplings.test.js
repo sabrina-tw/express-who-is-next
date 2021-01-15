@@ -1,128 +1,84 @@
 const app = require("../src/app");
 const request = require("supertest");
+const Jumpling = require("../src/models/jumpling.model");
+const dbHandlers = require("../test/dbHandler");
 
-describe("GET /jumplings", () => {
-  it("should retrieve list of jumplings", async () => {
-    const response = await request(app).get("/jumplings");
+describe("jumplings", () => {
+  beforeAll(async () => await dbHandlers.connect());
+  afterEach(async () => await dbHandlers.clearDatabase());
+  afterAll(async () => await dbHandlers.closeDatabase());
+  beforeEach(async () => {
+    const jumplings = [
+      { name: "Sabrina" },
+      { name: "Mathilda" },
+      { name: "Brenda" },
+    ];
 
-    expect(response.status).toEqual(200);
-    expect(response.body).toEqual([]);
-  });
-});
-
-describe("POST /jumplings", () => {
-  it("should add new jumpling and return new jumpling object", async () => {
-    const newJumpling = { name: "New jumpling" };
-    const expectedJumpling = { id: 1, name: "New jumpling" };
-
-    const response = await request(app).post("/jumplings").send(newJumpling);
-
-    expect(response.status).toEqual(201);
-    expect(response.body).toEqual(expectedJumpling);
+    await Jumpling.create(jumplings);
   });
 
-  it("should throw error if req.body is not json", async () => {
-    const newJumpling = "notjson";
+  describe("GET /jumplings", () => {
+    it("should retrieve list of jumplings", async () => {
+      const expectedJumplings = [
+        { name: "Sabrina" },
+        { name: "Mathilda" },
+        { name: "Brenda" },
+      ];
 
-    const response = await request(app).post("/jumplings").send(newJumpling);
+      const { body } = await request(app).get("/jumplings").expect(200);
 
-    expect(response.status).toEqual(400);
+      expect(body.length).toEqual(3);
+    });
   });
 
-  it("should throw error if name is empty", async () => {
-    const newJumpling = { name: "" };
+  describe("GET /jumplings/presenter", () => {
+    it("should return a random jumpling", async () => {
+      const { body } = await request(app)
+        .get("/jumplings/presenter")
+        .expect(200);
 
-    const response = await request(app).post("/jumplings").send(newJumpling);
-
-    expect(response.status).toEqual(400);
-  });
-});
-
-describe("GET /jumplings/:id", () => {
-  it("should retrieve jumpling of specified id", async () => {
-    const jumplingId = 1;
-    const expectedJumpling = { id: 1, name: "New jumpling" };
-    const response = await request(app).get(`/jumplings/${jumplingId}`);
-
-    expect(response.status).toEqual(200);
-    expect(response.body).toEqual(expectedJumpling);
+      expect(body.length).toEqual(1);
+    });
   });
 
-  it("should throw error if jumpling does not exist", async () => {
-    const nonexistentJumplingId = 999;
-    const response = await request(app).get(
-      `/jumplings/${nonexistentJumplingId}`
-    );
+  describe("GET /jumplings/:name", () => {
+    it("should retrieve jumpling with requested name", async () => {
+      const jumpling = { name: "Sabrina" };
 
-    expect(response.status).toEqual(404);
-  });
-});
+      const { body } = await request(app)
+        .get(`/jumplings/${jumpling.name}`)
+        .expect(200);
 
-describe("PUT /jumplings/:id", () => {
-  it("should modify jumpling and return modified jumpling object", async () => {
-    const jumplingId = 1;
-    const modifiedJumpling = { name: "New jumpling edited" };
-
-    const response = await request(app)
-      .put(`/jumplings/${jumplingId}`)
-      .send(modifiedJumpling);
-
-    expect(response.status).toEqual(200);
-    expect(response.body).toMatchObject(modifiedJumpling);
+      expect(body).toMatchObject(jumpling);
+    });
   });
 
-  it("should throw error if jumpling does not exist", async () => {
-    const nonexistentJumplingId = 999;
-    const modifiedJumpling = { name: "New jumpling edited" };
+  describe("POST /jumplings", () => {
+    it("should create new jumpling if fields are valid", async () => {
+      const jumpling = { name: "Teresa" };
 
-    const response = await request(app)
-      .put(`/jumplings/${nonexistentJumplingId}`)
-      .send(modifiedJumpling);
+      const { body } = await request(app)
+        .post("/jumplings")
+        .send(jumpling)
+        .expect(201);
 
-    expect(response.status).toEqual(404);
-  });
+      expect(body).toMatchObject(jumpling);
+    });
 
-  it("should throw error if req.body is not json", async () => {
-    const jumplingId = 1;
-    const modifiedJumpling = "notjson";
+    it("should throw error if name is empty", async () => {
+      const jumpling = { name: "" };
 
-    const response = await request(app)
-      .put(`/jumplings/${jumplingId}`)
-      .send(modifiedJumpling);
+      const response = await request(app).post("/jumplings").send(jumpling);
 
-    expect(response.status).toEqual(400);
-  });
+      expect(response.status).toEqual(400);
+    });
 
-  it("should throw error if name is empty", async () => {
-    const jumplingId = 1;
-    const modifiedJumpling = { name: "" };
+    it("should throw error if name is too short", async () => {
+      const jumpling = { name: "a" };
 
-    const response = await request(app)
-      .put(`/jumplings/${jumplingId}`)
-      .send(modifiedJumpling);
+      const response = await request(app).post("/jumplings").send(jumpling);
 
-    expect(response.status).toEqual(400);
-  });
-});
-
-describe("DELETE /jumpling/:id", () => {
-  it("should delete jumpling and return deleted jumpling object", async () => {
-    const jumplingId = 1;
-    const deletedJumpling = { id: 1, name: "New jumpling edited" };
-
-    const response = await request(app).delete(`/jumplings/${jumplingId}`);
-
-    expect(response.status).toEqual(200);
-    expect(response.body).toEqual(deletedJumpling);
-  });
-
-  it("should throw error if jumpling does not exist", async () => {
-    const nonexistentJumplingId = 999;
-
-    const response = await request(app).delete(
-      `/jumplings/${nonexistentJumplingId}`
-    );
-
-    expect(response.status).toEqual(404);
+      expect(response.status).toEqual(400);
+    });
   });
 });
