@@ -81,4 +81,40 @@ describe("jumplings", () => {
       expect(response.status).toEqual(400);
     });
   });
+
+  describe("PUT /jumplings/:id", () => {
+    it("should modify specified jumpling is fields are valid", async () => {
+      const jumpling = await Jumpling.findOne();
+      const modifiedJumplingBody = { name: "edited" };
+
+      const { body } = await request(app)
+        .put(`/jumplings/${jumpling.id}`)
+        .send(modifiedJumplingBody)
+        .expect(200);
+
+      expect(body).toMatchObject(modifiedJumplingBody);
+    });
+
+    it("should throw error if name is empty", async () => {
+      const jumpling = await Jumpling.findOne();
+      const modifiedJumplingBody = { name: "" };
+
+      const { status } = await request(app)
+        .put(`/jumplings/${jumpling.id}`)
+        .send(modifiedJumplingBody);
+
+      expect(status).toEqual(400);
+    });
+
+    it("should throw error if request body is not json", async () => {
+      const jumpling = await Jumpling.findOne();
+      const modifiedJumplingBody = "not-json-format";
+
+      const { status } = await request(app)
+        .put(`/jumplings/${jumpling.id}`)
+        .send(modifiedJumplingBody);
+
+      expect(status).toEqual(400);
+    });
+  });
 });

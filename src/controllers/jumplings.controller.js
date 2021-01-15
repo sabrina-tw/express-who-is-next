@@ -37,9 +37,23 @@ const addJumpling = async (req, res, next) => {
   }
 };
 
+const updateJumpling = async (req, res, next) => {
+  try {
+    const updatedJumpling = await Jumpling.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+    res.status(200).json(updatedJumpling);
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   getAllJumplings,
   getRandomJumpling,
   getJumplingByName,
   addJumpling,
+  updateJumpling,
 };

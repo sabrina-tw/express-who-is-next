@@ -11,7 +11,7 @@ router.get("/:name", ctrl.getJumplingByName);
 
 router.post("/", requireJsonContent, ctrl.addJumpling);
 
-// router.put("/:id", requireJsonContent)
+router.put("/:id", requireJsonContent, ctrl.updateJumpling);
 
 // router.delete("/:id")
 
