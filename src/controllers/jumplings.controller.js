@@ -50,10 +50,20 @@ const updateJumpling = async (req, res, next) => {
   }
 };
 
+const deleteJumpling = async (req, res, next) => {
+  try {
+    const jumpling = await Jumpling.findByIdAndDelete(req.params.id);
+    res.status(200).json(jumpling);
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   getAllJumplings,
   getRandomJumpling,
   getJumplingByName,
   addJumpling,
   updateJumpling,
+  deleteJumpling,
 };

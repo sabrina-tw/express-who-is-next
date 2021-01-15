@@ -117,4 +117,14 @@ describe("jumplings", () => {
       expect(status).toEqual(400);
     });
   });
+
+  describe("DELETE /jumplings/:id", () => {
+    it("should delete jumpling if jumpling exists", async () => {
+      const jumpling = await Jumpling.findOne();
+
+      const { status } = await request(app).delete(`/jumplings/${jumpling.id}`);
+
+      expect(status).toEqual(200);
+    });
+  });
 });

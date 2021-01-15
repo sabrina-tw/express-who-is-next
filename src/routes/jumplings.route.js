@@ -13,6 +13,6 @@ router.post("/", requireJsonContent, ctrl.addJumpling);
 
 router.put("/:id", requireJsonContent, ctrl.updateJumpling);
 
-// router.delete("/:id")
+router.delete("/:id", ctrl.deleteJumpling);
 
 module.exports = router;
