@@ -19,12 +19,6 @@ describe("jumplings", () => {
 
   describe("GET /jumplings", () => {
     it("should retrieve list of jumplings", async () => {
-      const expectedJumplings = [
-        { name: "Sabrina" },
-        { name: "Mathilda" },
-        { name: "Brenda" },
-      ];
-
       const { body } = await request(app).get("/jumplings").expect(200);
 
       expect(body.length).toEqual(3);
@@ -125,6 +119,16 @@ describe("jumplings", () => {
       const { status } = await request(app).delete(`/jumplings/${jumpling.id}`);
 
       expect(status).toEqual(200);
+    });
+
+    it("should throw error if jumpling does not exist", async () => {
+      const nonexistentJumplingId = 99999;
+
+      const { status } = await request(app).delete(
+        `/jumplings/${nonexistentJumplingId}`
+      );
+
+      expect(status).toEqual(400);
     });
   });
 });
