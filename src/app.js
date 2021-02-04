@@ -1,6 +1,9 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
+const cookieParser = require("cookie-parser");
 app.use(express.json());
+app.use(cookieParser());
 
 app.get("/", (req, res) => {
   const output = {
@@ -20,6 +23,8 @@ app.get("/", (req, res) => {
 
 const jumplingsRouter = require("./routes/jumplings.route");
 app.use("/jumplings", jumplingsRouter);
+const usersRouter = require("./routes/users.route");
+app.use("/users", usersRouter);
 
 app.use((err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
