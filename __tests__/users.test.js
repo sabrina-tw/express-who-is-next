@@ -47,12 +47,12 @@ describe("users", () => {
         username: "username",
         password: "password",
       };
-      const { text } = await request(app)
+      const response = await request(app)
         .post("/users/login")
         .send(user)
         .expect(200);
 
-      expect(text).toEqual("You are now logged in!");
+      expect(response.body.message).toEqual("You are now logged in!");
     });
 
     it("should not log user in when password is incorrect", async () => {

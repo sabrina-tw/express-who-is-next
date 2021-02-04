@@ -11,9 +11,9 @@ module.exports.connect = async () => {
 
   const mongooseOpts = {
     useNewUrlParser: true,
-    autoReconnect: true,
-    reconnectTries: Number.MAX_VALUE,
-    reconnectInterval: 1000,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+    useCreateIndex: true,
   };
 
   await mongoose.connect(uri, mongooseOpts);

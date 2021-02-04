@@ -2,6 +2,7 @@ const app = require("../src/app");
 const request = require("supertest");
 const Jumpling = require("../src/models/jumpling.model");
 const dbHandlers = require("../test/dbHandler");
+const User = require("../src/models/user.model");
 
 describe("jumplings", () => {
   beforeAll(async () => await dbHandlers.connect());
@@ -48,15 +49,29 @@ describe("jumplings", () => {
   });
 
   describe("POST /jumplings", () => {
-    it("should create new jumpling if fields are valid", async () => {
+    it("should create new jumpling if authorized and fields are valid", async () => {
+      const user = new User({ username: "new-username", password: "password" });
+      await user.save();
+      const token = user.generateJWT();
+
       const jumpling = { name: "Teresa" };
 
       const { body } = await request(app)
         .post("/jumplings")
+        .set("Cookie", `access_token=${token}`)
         .send(jumpling)
         .expect(201);
 
       expect(body).toMatchObject(jumpling);
+    });
+
+    it("should throw error if not authorized", async () => {
+      const jumpling = { name: "Teresa" };
+
+      const response = await request(app).post("/jumplings").send(jumpling);
+
+      // TODO: should return 401 Unauthorized instead
+      expect(response.status).toEqual(400);
     });
 
     it("should throw error if name is empty", async () => {

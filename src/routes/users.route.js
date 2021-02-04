@@ -2,6 +2,7 @@ const express = require("express");
 const User = require("../models/user.model");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
+const _ = require("lodash");
 
 router.post("/", async (req, res, next) => {
   try {
@@ -30,12 +31,16 @@ router.post("/login", async (req, res, next) => {
     const expiryDate = new Date(Date.now() + oneWeek);
 
     res
+      .status(200)
       .cookie("access_token", token, {
         expires: expiryDate,
         httpOnly: true,
         secure: true,
       })
-      .send("You are now logged in!");
+      .json({
+        message: "You are now logged in!",
+        user: _.pick(user, ["id", "username"]),
+      });
   } catch (err) {
     if (err.message === "Login failed") {
       err.statusCode = 400;
