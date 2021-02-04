@@ -12,8 +12,8 @@ router.get("/:name", ctrl.getJumplingByName);
 
 router.post("/", [auth.required, requireJsonContent], ctrl.addJumpling);
 
-router.put("/:id", requireJsonContent, ctrl.updateJumpling);
+router.put("/:id", [auth.required, requireJsonContent], ctrl.updateJumpling);
 
-router.delete("/:id", ctrl.deleteJumpling);
+router.delete("/:id", auth.required, ctrl.deleteJumpling);
 
 module.exports = router;

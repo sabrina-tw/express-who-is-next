@@ -5,7 +5,15 @@ const dbHandlers = require("../test/dbHandler");
 const User = require("../src/models/user.model");
 
 describe("jumplings", () => {
-  beforeAll(async () => await dbHandlers.connect());
+  let token;
+
+  beforeAll(async () => {
+    await dbHandlers.connect();
+
+    const user = new User({ username: "new-username", password: "password" });
+    await user.save();
+    token = user.generateJWT();
+  });
   afterEach(async () => await dbHandlers.clearDatabase());
   afterAll(async () => await dbHandlers.closeDatabase());
   beforeEach(async () => {
@@ -50,10 +58,6 @@ describe("jumplings", () => {
 
   describe("POST /jumplings", () => {
     it("should create new jumpling if authorized and fields are valid", async () => {
-      const user = new User({ username: "new-username", password: "password" });
-      await user.save();
-      const token = user.generateJWT();
-
       const jumpling = { name: "Teresa" };
 
       const { body } = await request(app)
@@ -92,16 +96,28 @@ describe("jumplings", () => {
   });
 
   describe("PUT /jumplings/:id", () => {
-    it("should modify specified jumpling is fields are valid", async () => {
+    it("should modify specified jumpling if authorized and fields are valid", async () => {
       const jumpling = await Jumpling.findOne();
       const modifiedJumplingBody = { name: "edited" };
 
       const { body } = await request(app)
         .put(`/jumplings/${jumpling.id}`)
+        .set("Cookie", `access_token=${token}`)
         .send(modifiedJumplingBody)
         .expect(200);
 
       expect(body).toMatchObject(modifiedJumplingBody);
+    });
+
+    it("should throw error if not authorized", async () => {
+      const jumpling = await Jumpling.findOne();
+      const modifiedJumplingBody = { name: "edited" };
+
+      const response = await request(app)
+        .put(`/jumplings/${jumpling.id}`)
+        .send(modifiedJumplingBody);
+
+      expect(response.status).toEqual(400);
     });
 
     it("should throw error if name is empty", async () => {
@@ -128,12 +144,22 @@ describe("jumplings", () => {
   });
 
   describe("DELETE /jumplings/:id", () => {
-    it("should delete jumpling if jumpling exists", async () => {
+    it("should delete jumpling if authorized and jumpling exists", async () => {
+      const jumpling = await Jumpling.findOne();
+
+      const { status } = await request(app)
+        .delete(`/jumplings/${jumpling.id}`)
+        .set("Cookie", `access_token=${token}`);
+
+      expect(status).toEqual(200);
+    });
+
+    it("should throw error if not authorized", async () => {
       const jumpling = await Jumpling.findOne();
 
       const { status } = await request(app).delete(`/jumplings/${jumpling.id}`);
 
-      expect(status).toEqual(200);
+      expect(status).toEqual(400);
     });
 
     it("should throw error if jumpling does not exist", async () => {
