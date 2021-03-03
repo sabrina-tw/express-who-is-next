@@ -173,13 +173,14 @@ describe("jumplings", () => {
     });
 
     it("should throw error if jumpling does not exist", async () => {
-      const nonexistentJumplingId = 99999;
+      const nonexistentJumplingId = "603f38c9906c48d354d2a86b";
 
-      const { status } = await request(app).delete(
-        `/jumplings/${nonexistentJumplingId}`
-      );
+      const response = await request(app)
+        .delete(`/jumplings/${nonexistentJumplingId}`)
+        .set("Cookie", `access_token=${token}`);
 
-      expect(status).toEqual(400);
+      expect(response.status).toEqual(400);
+      expect(response.body.message).toEqual("Jumpling does not exist");
     });
   });
 });

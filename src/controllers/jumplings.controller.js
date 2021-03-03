@@ -52,7 +52,17 @@ const updateJumpling = async (req, res, next) => {
 
 const deleteJumpling = async (req, res, next) => {
   try {
-    const jumpling = await Jumpling.findByIdAndDelete(req.params.id);
+    const jumpling = await Jumpling.findByIdAndDelete(
+      req.params.id,
+      (err, jumpling) => {
+        if (err || !jumpling) {
+          const err = new Error("Jumpling does not exist");
+          err.statusCode = 404;
+          next(err);
+        }
+      }
+    );
+
     res.status(200).json(jumpling);
   } catch (err) {
     next(err);
