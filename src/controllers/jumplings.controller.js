@@ -1,5 +1,13 @@
 const Jumpling = require("../models/jumpling.model");
 
+const handleNonExistentJumpling = (err, jumpling, next) => {
+  if (err || !jumpling) {
+    const err = new Error("Jumpling does not exist");
+    err.statusCode = 404;
+    next(err);
+  }
+};
+
 const getAllJumplings = async (req, res, next) => {
   try {
     const jumplings = await Jumpling.find();
@@ -43,13 +51,7 @@ const updateJumpling = async (req, res, next) => {
       req.params.id,
       req.body,
       { new: true, runValidators: true },
-      (err, jumpling) => {
-        if (err || !jumpling) {
-          const err = new Error("Jumpling does not exist");
-          err.statusCode = 404;
-          next(err);
-        }
-      }
+      (err, jumpling) => handleNonExistentJumpling(err, jumpling, next)
     );
     res.status(200).json(updatedJumpling);
   } catch (err) {
@@ -61,13 +63,7 @@ const deleteJumpling = async (req, res, next) => {
   try {
     const jumpling = await Jumpling.findByIdAndDelete(
       req.params.id,
-      (err, jumpling) => {
-        if (err || !jumpling) {
-          const err = new Error("Jumpling does not exist");
-          err.statusCode = 404;
-          next(err);
-        }
-      }
+      (err, jumpling) => handleNonExistentJumpling(err, jumpling, next)
     );
 
     res.status(200).json(jumpling);
