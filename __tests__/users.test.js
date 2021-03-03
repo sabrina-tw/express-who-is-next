@@ -35,7 +35,7 @@ describe("users", () => {
       const { body } = await request(app)
         .post("/users")
         .send(expectedUser)
-        .expect(400);
+        .expect(500);
 
       expect(body.message).toContain("User validation failed");
     });

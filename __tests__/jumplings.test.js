@@ -84,24 +84,29 @@ describe("jumplings", () => {
 
       const response = await request(app).post("/jumplings").send(jumpling);
 
-      // TODO: should return 401 Unauthorized instead
-      expect(response.status).toEqual(400);
+      expect(response.status).toEqual(500);
     });
 
     it("should throw error if name is empty", async () => {
       const jumpling = { name: "" };
 
-      const response = await request(app).post("/jumplings").send(jumpling);
+      const response = await request(app)
+        .post("/jumplings")
+        .set("Cookie", `access_token=${token}`)
+        .send(jumpling);
 
-      expect(response.status).toEqual(400);
+      expect(response.status).toEqual(500);
     });
 
     it("should throw error if name is too short", async () => {
       const jumpling = { name: "a" };
 
-      const response = await request(app).post("/jumplings").send(jumpling);
+      const response = await request(app)
+        .post("/jumplings")
+        .set("Cookie", `access_token=${token}`)
+        .send(jumpling);
 
-      expect(response.status).toEqual(400);
+      expect(response.status).toEqual(500);
     });
   });
 
@@ -127,7 +132,7 @@ describe("jumplings", () => {
         .put(`/jumplings/${jumpling.id}`)
         .send(modifiedJumplingBody);
 
-      expect(response.status).toEqual(400);
+      expect(response.status).toEqual(500);
     });
 
     it("should throw error if name is empty", async () => {
@@ -149,7 +154,7 @@ describe("jumplings", () => {
         .put(`/jumplings/${jumpling.id}`)
         .send(modifiedJumplingBody);
 
-      expect(status).toEqual(400);
+      expect(status).toEqual(500);
     });
   });
 
@@ -169,7 +174,7 @@ describe("jumplings", () => {
 
       const { status } = await request(app).delete(`/jumplings/${jumpling.id}`);
 
-      expect(status).toEqual(400);
+      expect(status).toEqual(500);
     });
 
     it("should throw error if jumpling does not exist", async () => {
