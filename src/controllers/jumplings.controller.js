@@ -42,7 +42,14 @@ const updateJumpling = async (req, res, next) => {
     const updatedJumpling = await Jumpling.findByIdAndUpdate(
       req.params.id,
       req.body,
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
+      (err, jumpling) => {
+        if (err || !jumpling) {
+          const err = new Error("Jumpling does not exist");
+          err.statusCode = 404;
+          next(err);
+        }
+      }
     );
     res.status(200).json(updatedJumpling);
   } catch (err) {
