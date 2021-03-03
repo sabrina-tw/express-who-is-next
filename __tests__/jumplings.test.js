@@ -54,6 +54,16 @@ describe("jumplings", () => {
 
       expect(body).toMatchObject(jumpling);
     });
+
+    it("should retrieve jumpling with requested name in lowercase", async () => {
+      const jumpling = { name: "sabrina" };
+
+      const { body } = await request(app)
+        .get(`/jumplings/${jumpling.name}`)
+        .expect(200);
+
+      expect(body.name.toLowerCase()).toEqual(jumpling.name);
+    });
   });
 
   describe("POST /jumplings", () => {
