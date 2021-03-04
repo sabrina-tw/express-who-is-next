@@ -1,13 +1,5 @@
 const Jumpling = require("../models/jumpling.model");
 
-const handleNonExistentJumpling = (err, jumpling, next) => {
-  if (err || !jumpling) {
-    const err = new Error("Jumpling does not exist");
-    err.statusCode = 404;
-    next(err);
-  }
-};
-
 const getAllJumplings = async (req, res, next) => {
   try {
     const jumplings = await Jumpling.find();
@@ -50,10 +42,14 @@ const updateJumpling = async (req, res, next) => {
     const updatedJumpling = await Jumpling.findByIdAndUpdate(
       req.params.id,
       req.body,
-      { new: true, runValidators: true },
-      (err, jumpling) => handleNonExistentJumpling(err, jumpling, next)
+      { new: true, runValidators: true }
     );
-    res.status(200).json(updatedJumpling);
+
+    if (!updatedJumpling) {
+      res.status(404).json({ message: "Jumpling does not exist" });
+    } else {
+      res.status(200).json(updatedJumpling);
+    }
   } catch (err) {
     next(err);
   }
@@ -61,12 +57,13 @@ const updateJumpling = async (req, res, next) => {
 
 const deleteJumpling = async (req, res, next) => {
   try {
-    const jumpling = await Jumpling.findByIdAndDelete(
-      req.params.id,
-      (err, jumpling) => handleNonExistentJumpling(err, jumpling, next)
-    );
+    const jumpling = await Jumpling.findByIdAndDelete(req.params.id);
 
-    res.status(200).json(jumpling);
+    if (!jumpling) {
+      res.status(404).json({ message: "Jumpling does not exist" });
+    } else {
+      res.status(200).json(jumpling);
+    }
   } catch (err) {
     next(err);
   }

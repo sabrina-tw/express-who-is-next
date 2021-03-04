@@ -95,7 +95,7 @@ describe("jumplings", () => {
         .set("Cookie", `access_token=${token}`)
         .send(jumpling);
 
-      expect(response.status).toEqual(500);
+      expect(response.status).toEqual(400);
     });
 
     it("should throw error if name is too short", async () => {
@@ -106,7 +106,7 @@ describe("jumplings", () => {
         .set("Cookie", `access_token=${token}`)
         .send(jumpling);
 
-      expect(response.status).toEqual(500);
+      expect(response.status).toEqual(400);
     });
   });
 
@@ -144,7 +144,7 @@ describe("jumplings", () => {
         .set("Cookie", `access_token=${token}`)
         .send(modifiedJumplingBody);
 
-      expect(status).toEqual(404);
+      expect(status).toEqual(400);
     });
 
     it("should throw error if request body is not json", async () => {
@@ -153,13 +153,14 @@ describe("jumplings", () => {
 
       const { status } = await request(app)
         .put(`/jumplings/${jumpling.id}`)
+        .set("Cookie", `access_token=${token}`)
         .send(modifiedJumplingBody);
 
-      expect(status).toEqual(500);
+      expect(status).toEqual(400);
     });
 
     it("should throw error if jumpling does not exist", async () => {
-      const nonexistentJumplingId = "000";
+      const nonexistentJumplingId = "603f38c9906c48d354d2a86b";
       const modifiedJumplingBody = { name: "edited jumpling name" };
 
       const response = await request(app)
